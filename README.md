@@ -113,7 +113,7 @@ tuned by eye.
 | *head-down tilt only:* Temple-BF transient at each table movement | fitted (lands at about 1× the step) | proposed mechanism, see [Head-down tilt](#head-down-tilt-what-it-took-to-reproduce-it); Temple-BF uses heart-rate features (Sec. 2.2.1), and heart rate changes abruptly at each tilt (Fig. 4A) |
 | **tracking share w** | 0, 0.5, 1 | **the unknown**: 0 = Temple-BF only follows the maneuver; 1 = it follows the session's own brain physiology |
 
-### How the fit works (`fit_to_paper.py`)
+### How the fit works (`fit.py`)
 
 1. For each protocol and each w, simulated sessions go through the paper's analysis.
    The free parameters are fitted so that six published statistics come out right:
@@ -215,7 +215,7 @@ transitions, and it is shared by every session (group-mean r is no higher than
 per-session r). The lag search absorbs any difference in response speed, so the mismatch
 has to be a difference in *shape* at the transitions.
 
-**Screening candidate mechanisms** (`results/hdt_screen.py`; each one globally fitted,
+**Screening candidate mechanisms** (`scripts/screen_hdt.py`; each one globally fitted,
 χ² in the paper's standard errors, threshold 11.07):
 
 | candidate | χ², w = 0 | χ², w = 1 |
@@ -382,15 +382,15 @@ p(gap) stays near the nominal 5% (0–9%). So:
 pip install -r requirements.txt
 
 python -m pytest                              # tests
-python fit_to_paper.py --protocols squat,supine   # fit to the paper, gap ranges, power (~25 min on 4 cores)
-python fit_to_paper.py --protocols hdt --search-effort 2 --out results/fit_hdt.json   # ~40 min
-python results/merge_fit.py results/fit_hdt.json hdt
-python fit_to_paper.py --mixes 1 --phys-share 0.25 --out results/sens_q025.json   # a sensitivity run
+python fit.py --protocols squat,supine        # fit to the paper, gap ranges, power (~25 min on 4 cores)
+python fit.py --protocols hdt --search-effort 2 --out results/fit_hdt.json   # ~40 min
+python scripts/merge_fit.py results/fit_hdt.json hdt
+python fit.py --mixes 1 --phys-share 0.25 --out results/sensitivity_q025.json   # a sensitivity run
 python calibrate.py --studies 100 [--gap 5,30]   # false-positive check (~3 min)
 python simulate.py demo                       # one simulated study per device, fitted parameters
 
 # on recordings
-python shared_maneuver_test.py manifest.csv --out results/
+python mixed_pairs.py manifest.csv --out out/
 ```
 
 Options: `--layers brain_hbo,scalp_hbo` (NIRS columns; the first two are contrasted),
@@ -433,11 +433,12 @@ dataset in this format.
 
 | file | purpose |
 |---|---|
-| `shared_maneuver_test.py` | the analysis (numpy + scipy only) |
+| `mixed_pairs.py` | the analysis (numpy + scipy only) |
 | `simulate.py` | synthetic sessions; every parameter labelled with its source |
-| `fit_to_paper.py` | fits the simulation to the paper's published statistics; gap ranges and power |
-| `paper_fit.json` | the main fit (used by `simulate.py demo` and `calibrate.py`) |
-| `results/` | sensitivity runs, calibration output, the head-down tilt screen (`hdt_screen.py`) and the fit used for head-down tilt (`fit_hdt.json`, merged into `paper_fit.json` by `merge_fit.py`) |
+| `fit.py` | fits the simulation to the paper's published statistics; gap ranges and power |
+| `fit.json` | the fitted parameters (used by `simulate.py demo` and `calibrate.py`) |
+| `scripts/` | the head-down tilt screen and the helper that merges a separate fit into `fit.json` |
+| `results/` | sensitivity runs, calibration output, screen results and the head-down tilt fit |
 | `calibrate.py` | false-positive check on simulated null studies |
 | `tests/` | unit and end-to-end tests |
 
