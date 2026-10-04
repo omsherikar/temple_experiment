@@ -108,6 +108,9 @@ tuned by eye.
 | scalp response size and speed | fitted | Table 1 scalp median, Fig. 4 scalp group-mean r |
 | transition gaps between blocks | 8–20 s | **assumed** (not reported); varied in the sensitivity runs |
 | trackable share of brain variation (physiology vs inversion noise) | 50% | **assumed**; varied 25–100% in the sensitivity runs |
+| *head-down tilt only:* fast share of the brain response | fitted (lands at 0.99) | bounded by Fig. 3A, where brain ΔHbO jumps almost at once when the table tilts |
+| *head-down tilt only:* brain decline within a block | fitted, capped at 25% (lands at 14–25%) | Fig. 3A: brain ΔHbO falls about 12% from its peak by the end of each block |
+| *head-down tilt only:* Temple-BF transient at each table movement | fitted (lands at about 1× the step) | proposed mechanism, see [Head-down tilt](#head-down-tilt-what-it-took-to-reproduce-it); Temple-BF uses heart-rate features (Sec. 2.2.1), and heart rate changes abruptly at each tilt (Fig. 4A) |
 | **tracking share w** | 0, 0.5, 1 | **the unknown**: 0 = Temple-BF only follows the maneuver; 1 = it follows the session's own brain physiology |
 
 ### How the fit works (`fit_to_paper.py`)
@@ -161,7 +164,14 @@ row of each block). χ² ≤ 11.07 means consistent with the paper.
 | supine | 0.5 | 0.840 | 0.767 | 0.800 | 0.867 | 0.941 | 0.929 | 14.0 | 4.1 |
 | supine | 1 | 0.845 | 0.767 | 0.798 | 0.858 | 0.940 | 0.930 | 14.9 | 11.9 |
 | head-down tilt | *paper* | *0.912* | *0.494* | *0.826* | *0.878* | *0.915* | *0.430* | *13–15* | |
-| head-down tilt | 0 / 0.5 / 1 | 0.88–0.90 | 0.45–0.47 | 0.83–0.84 | 0.92–0.95 | 0.92 | 0.54–0.56 | 15–20 | **407–579** |
+| head-down tilt | 0 | 0.911 | 0.475 | 0.826 | 0.877 | 0.915 | 0.607 | 15.0 | 1.1 |
+| head-down tilt | 0.5 | 0.909 | 0.483 | 0.829 | 0.879 | 0.915 | 0.578 | 14.0 | 1.3 |
+| head-down tilt | 1 | 0.909 | 0.480 | 0.827 | 0.878 | 0.916 | 0.589 | 14.2 | 1.2 |
+
+Head-down tilt rows use the extended model described [below](#head-down-tilt-what-it-took-to-reproduce-it);
+the original model gave χ² = 407–579 there. The scalp group-mean r for head-down tilt
+stays too high (0.58–0.61 against 0.430), because the scalp model is a single smooth
+response and the paper's scalp trace drifts (Fig. 3A). The scalp does not enter the gap.
 
 What this says:
 
@@ -176,17 +186,69 @@ What this says:
    misaligned. This hints that Temple-BF carries session-specific information during
    squats, but the hint depends on the model. The robustness runs below test it, and only
    the mixed-pair test on real data can settle it.
-3. **Head-down tilt is not reproduced by any version of the model** (χ² ≥ 344 in every
-   run). The paper's per-session r (0.912) is almost equal to its group-mean r (0.915),
-   while its transition r is lower (0.878). The simple response shapes used here cannot
-   produce that combination; the tilt-table response probably has a different shape.
-   So nothing below is predicted for head-down tilt.
+3. **For head-down tilt, the published statistics also fit every tracking share equally
+   well** (χ² 1.1–1.3), once the model includes the mechanisms in the next section. They
+   also allow almost no session-to-session brain variation, so even a perfect tracker may
+   have little to track there.
 4. **The paper's brain-versus-scalp contrast does not need any tracking.** With w = 0, the
    brain-layer r beats the scalp-layer r (one-sided Wilcoxon, p < 0.05) in 100% of
    simulated studies for every protocol. A device that only follows the maneuver
    reproduces the paper's main contrast, because the brain layer's *average* response
    resembles the device's average response more than the scalp layer's does. Repeating
    the contrast on the gap (`brain − scalp` in the output) removes this.
+
+## Head-down tilt: what it took to reproduce it
+
+The original model failed for head-down tilt (χ² 407–579). The pattern it could not
+produce is this:
+
+| head-down tilt | paper | original model |
+|---|---|---|
+| per-session lag-adjusted r | 0.912 | 0.88–0.90 |
+| transition-window r | **0.878**, below the full session | 0.92–0.95, above it |
+| group-mean r | 0.915, about equal to per-session r | 0.92 |
+| median lag | 13–15 s | 15–20 s |
+
+In the paper, the ±90 s window around each tilt matches *worse* than the session as a
+whole. So the mismatch between Temple-BF and the brain layer is concentrated at the
+transitions, and it is shared by every session (group-mean r is no higher than
+per-session r). The lag search absorbs any difference in response speed, so the mismatch
+has to be a difference in *shape* at the transitions.
+
+**Screening candidate mechanisms** (`results/hdt_screen.py`; each one globally fitted,
+χ² in the paper's standard errors, threshold 11.07):
+
+| candidate | χ², w = 0 | χ², w = 1 |
+|---|---|---|
+| Temple-BF smooths more slowly + part of the brain response is fast | 492 | 474 |
+| brain response adapts (falls back) within each block | 404 | 540 |
+| **Temple-BF has a transient at each table movement** | 43 | 66 |
+| transient + unconstrained adaptation | 30 | 10.4 |
+| **transient + brain shape bounded by Fig. 3A** (fast rise, at most 25% decline) | **1.7** | **1.5** |
+
+Only candidates with a Temple-BF transient come close. Unconstrained, the fit also
+wanted the brain response to fall back by 75% within each block. Fig. 3A shows about
+12%, so that solution was rejected and the decline was capped at 25%. With the brain
+shape bounded by the figure, the full fit reproduces all four brain-layer statistics
+and the lag at every tracking share (χ² 1.1–1.3).
+
+**The proposal.** During head-down tilt, Temple-BF probably shows a short excursion at
+each table movement, about the size of the block response itself, that the brain layer
+does not show. A plausible source is in the paper: Temple-BF includes heart-rate and
+pulse-waveform features (Sec. 2.2.1), and Fig. 4A shows heart rate changing abruptly at
+every tilt. Temple can check this directly with data they already have:
+
+1. Average Temple-BF (and heart rate) in a ±30 s window around each table movement,
+   aligned on the events file or the accelerometer, and compare with brain-layer ΔHbO.
+   The model predicts an excursion in Temple-BF that peaks about 10–25 s after the
+   table starts moving and is absent from the brain layer.
+2. Re-run the paper's correlations with those windows masked. If the transient is the
+   cause, the transition-window r should rise towards the full-session r.
+
+This is the weakest part of the simulation. The extended head-down tilt model has 8
+fitted parameters against 5 published statistics, so a good fit shows the mechanism
+*can* produce the paper's numbers, not that it does. The check above is the way to find
+out.
 
 ## What the test would show on real recordings
 
@@ -202,6 +264,14 @@ calibrated one (see Calibration).
 | supine | 0 | 0.001 | 1 | −0.008 | 0.03 (false positives) |
 | supine | 0.5 | 0.001 – 0.008 | 2 – 5 | −0.008 – 0.009 | 0.00 – 0.15 |
 | supine | 1 | 0.015 – 0.019 | 11 – 12 | 0.05 – 0.08 | 1.00 |
+| head-down tilt | 0 | −0.001 | 1 | 0.000 | 0.00 (false positives) |
+| head-down tilt | 0.5 | 0.000 – 0.010 | 1 – 6 | −0.002 – 0.028 | 0.00 – 0.85 |
+| head-down tilt | 1 | 0.000 – 0.030 | 1 – 19 | −0.002 – 0.166 | 0.00 – 1.00 |
+
+Head-down tilt is the least predictable routine. Its statistics allow the
+session-specific brain variation to be anywhere from almost none (brain variation SD
+0.012 of the step) to moderate (0.20). At the low end there is nothing for even a perfect
+tracker to follow, and the test shows no gap.
 
 Gaps look small in units of r because the headline r is already high: the maneuver
 alone gives r ≈ 0.76–0.84 here. The identification count is easier to read. A device
@@ -231,7 +301,9 @@ What to expect on the real data, then:
   low-end exceptions are when little of the brain variation is trackable.
 - For stand-to-supine the expected gap is smaller, and detection depends on the
   assumptions.
-- **Squat is the protocol to run first.**
+- Head-down tilt could show anything from no gap to a clear one. A null result there
+  would say little about the device.
+- **Squat is the protocol to run first**, then supine, then head-down tilt.
 
 ### Calibration
 
@@ -241,12 +313,14 @@ and shows the share with p < 0.05:
 
 | protocol | analysis | transition gaps 8–20 s: p(gap) | p(perm) | gaps 5–30 s: p(gap) | p(perm) |
 |---|---|---|---|---|---|
-| squat | full, lag-adjusted | 0.00 | 0.15 | **0.29** | **0.72** |
-| squat | residual, lag-adjusted | 0.09 | 0.15 | 0.07 | 0.11 |
-| supine | full, lag-adjusted | 0.03 | 0.07 | **0.19** | **0.35** |
-| supine | residual, lag-adjusted | 0.06 | 0.10 | 0.05 | 0.10 |
-| head-down tilt | full, lag-adjusted | 0.08 | 0.23 | **0.61** | **0.84** |
-| head-down tilt | residual, lag-adjusted | 0.04 | 0.05 | 0.01 | 0.03 |
+| squat | full, lag-adjusted | 0.06 | 0.22 | **0.34** | **0.67** |
+| squat | residual, lag-adjusted | 0.04 | 0.08 | 0.02 | 0.05 |
+| supine | full, lag-adjusted | 0.03 | 0.12 | 0.09 | **0.25** |
+| supine | residual, lag-adjusted | 0.01 | 0.03 | 0.09 | 0.09 |
+| head-down tilt | full, lag-adjusted | 0.00 | **0.44** | 0.00 | **0.77** |
+| head-down tilt | residual, lag-adjusted | 0.00 | 0.06 | 0.00 | 0.24 |
+
+With 100 studies, each rate has a Monte Carlo error of about ±2–3 points.
 
 (`python calibrate.py --studies 100 --gap 5,30` for the right-hand columns; full output,
 including zero-lag rows, in `results/calibration_*.txt`.)
@@ -254,9 +328,9 @@ including zero-lag rows, in `results/calibration_*.txt`.)
 **This changed the method.** On full sessions, a real pair shares its own exact
 transition timing, and mixed pairs cannot fully reproduce that even after time-warping.
 When transition durations vary a lot, that timing alone produces a small but
-"significant" gap (0.002–0.003) for a device that only follows the maneuver. The
-residual analysis regresses each session's own timing out, and it stays near the
-nominal 5% (1–9%). So:
+"significant" gap for a device that only follows the maneuver: up to 34% false positives
+for squat. The residual analysis regresses each session's own timing out, and its
+p(gap) stays near the nominal 5% (0–9%). So:
 
 - **The residual p(gap) is the test for session-specific tracking.**
 - The full-session real / mixed / gap numbers describe how much of the headline the
@@ -295,7 +369,8 @@ nominal 5% (1–9%). So:
   the paper's stand-to-supine brain-minus-scalp difference was not significant
   (p = 0.082), but it is significant in every simulated study. So the power figures
   above are best cases.
-- **Head-down tilt is not modelled well** (see above), so there is no prediction for it.
+- **Head-down tilt needs extra, proposed mechanisms** (see above). Its predictions rest
+  on a model with more free parameters than published statistics.
 - **The simulation is a model.** The response shapes are first-order, the device is a
   linear mix, and the fluctuations are band-limited noise. The fits show this model is
   consistent with the paper's published numbers for squat and supine, not that it is
@@ -307,7 +382,9 @@ nominal 5% (1–9%). So:
 pip install -r requirements.txt
 
 python -m pytest                              # tests
-python fit_to_paper.py                        # fit to the paper, gap ranges, power (~25 min on 4 cores)
+python fit_to_paper.py --protocols squat,supine   # fit to the paper, gap ranges, power (~25 min on 4 cores)
+python fit_to_paper.py --protocols hdt --search-effort 2 --out results/fit_hdt.json   # ~40 min
+python results/merge_fit.py results/fit_hdt.json hdt
 python fit_to_paper.py --mixes 1 --phys-share 0.25 --out results/sens_q025.json   # a sensitivity run
 python calibrate.py --studies 100 [--gap 5,30]   # false-positive check (~3 min)
 python simulate.py demo                       # one simulated study per device, fitted parameters
@@ -360,7 +437,7 @@ dataset in this format.
 | `simulate.py` | synthetic sessions; every parameter labelled with its source |
 | `fit_to_paper.py` | fits the simulation to the paper's published statistics; gap ranges and power |
 | `paper_fit.json` | the main fit (used by `simulate.py demo` and `calibrate.py`) |
-| `results/` | sensitivity runs and calibration output behind the tables above |
+| `results/` | sensitivity runs, calibration output, the head-down tilt screen (`hdt_screen.py`) and the fit used for head-down tilt (`fit_hdt.json`, merged into `paper_fit.json` by `merge_fit.py`) |
 | `calibrate.py` | false-positive check on simulated null studies |
 | `tests/` | unit and end-to-end tests |
 

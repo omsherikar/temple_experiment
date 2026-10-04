@@ -1,0 +1,54 @@
+[
+ [
+  "Fig.3A-bounded + transient",
+  0.0,
+  1.6824439585916555,
+  {
+   "r_lag_brain": 0.9120625722598024,
+   "r_lag_scalp": 0.5581811417152301,
+   "r_zero_brain": 0.8341799856662233,
+   "r_transition": 0.8768317755865642,
+   "r_group_brain": 0.9154004751384954,
+   "r_group_scalp": 0.8715476204285464,
+   "lag_brain_s": 15.0,
+   "gap": -0.0005176856443484534,
+   "identified": 0.75
+  },
+  {
+   "brain_noise": 0.02,
+   "bf_noise": 0.017,
+   "bf_lag_s": 15.11,
+   "bf_drift": 0.061,
+   "brain_fast_share": 0.988,
+   "brain_adapt": 0.235,
+   "brain_adapt_tau_s": 117.191,
+   "bf_transient": 1.109
+  }
+ ],
+ [
+  "Fig.3A-bounded + transient",
+  1.0,
+  1.4504816766854312,
+  {
+   "r_lag_brain": 0.9094684634174188,
+   "r_lag_scalp": 0.5566433723780368,
+   "r_zero_brain": 0.833316406273881,
+   "r_transition": 0.8764445827827466,
+   "r_group_brain": 0.9157846925437897,
+   "r_group_scalp": 0.8701086635913626,
+   "lag_brain_s": 14.0,
+   "gap": 0.0068765019297145485,
+   "identified": 8.25
+  },
+  {
+   "brain_noise": 0.095,
+   "bf_noise": 0.019,
+   "bf_lag_s": 14.431,
+   "bf_drift": -0.033,
+   "brain_fast_share": 0.942,
+   "brain_adapt": 0.189,
+   "brain_adapt_tau_s": 84.293,
+   "bf_transient": 1.092
+  }
+ ]
+]

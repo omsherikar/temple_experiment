@@ -1,14 +1,14 @@
 Share of 100 simulated null studies with p < 0.05 (brain layer, tilt-only device)
 protocol variant   kind    p(gap)  p(perm)  p(id)
-hdt      full      lag       0.61     0.84   0.11
-hdt      full      zero      0.08     0.78   0.10
-hdt      residual  lag       0.01     0.03   0.02
-hdt      residual  zero      0.03     0.04   0.02
-squat    full      lag       0.29     0.72   0.14
-squat    full      zero      0.05     0.56   0.09
-squat    residual  lag       0.07     0.11   0.04
-squat    residual  zero      0.06     0.09   0.05
-supine   full      lag       0.19     0.35   0.07
-supine   full      zero      0.07     0.37   0.07
-supine   residual  lag       0.05     0.10   0.03
-supine   residual  zero      0.05     0.05   0.01
+squat    full      lag       0.34     0.67   0.15
+squat    full      zero      0.02     0.60   0.09
+squat    residual  lag       0.02     0.05   0.04
+squat    residual  zero      0.03     0.07   0.07
+supine   full      lag       0.09     0.25   0.10
+supine   full      zero      0.13     0.43   0.05
+supine   residual  lag       0.09     0.09   0.03
+supine   residual  zero      0.05     0.06   0.04
+hdt      full      lag       0.00     0.77   0.19
+hdt      full      zero      0.00     0.01   0.01
+hdt      residual  lag       0.00     0.24   0.02
+hdt      residual  zero      0.00     0.09   0.03

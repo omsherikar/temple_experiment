@@ -20,483 +20,35 @@
       2029
     ],
     "chi2_threshold": 11.07,
-    "studies": 40
+    "studies": 40,
+    "merged": {
+      "hdt": {
+        "from": "results/fit_hdt.json",
+        "phys_share": 0.5,
+        "band_hz": [
+          0.01,
+          0.12
+        ],
+        "gap_s": [
+          8.0,
+          20.0
+        ],
+        "fit_seeds": [
+          1000,
+          1001,
+          1002,
+          1003
+        ],
+        "se_seeds": [
+          2000,
+          2029
+        ],
+        "chi2_threshold": 11.07,
+        "studies": 40
+      }
+    }
   },
   "fits": [
-    {
-      "protocol": "hdt",
-      "mix": 0.0,
-      "params": {
-        "block_s": 180.0,
-        "tau_brain_s": [
-          14.426950408889635,
-          28.85390081777927
-        ],
-        "band_hz": [
-          0.01,
-          0.12
-        ],
-        "gap_s": [
-          8.0,
-          20.0
-        ],
-        "phys_share": 0.5,
-        "white_noise": 0.05,
-        "brain_noise": 0.08926348232851981,
-        "bf_noise": 0.22965225953444687,
-        "bf_lag_s": 18.264586212406357,
-        "bf_drift": -0.6120896377677529,
-        "scalp_amp": 4.996532218066045,
-        "scalp_tau_s": 199.98749586172121
-      },
-      "chi2": 578.4748391360969,
-      "consistent": false,
-      "se": {
-        "r_lag_brain": 0.00952928822827194,
-        "r_zero_brain": 0.01597663550166019,
-        "r_transition": 0.016618235077806673,
-        "r_group_brain": 0.008637184521110302,
-        "r_lag_scalp": 0.006861061125715636,
-        "r_group_scalp": 0.024215202736142187,
-        "lag_brain_s": 1.3087899122788036
-      },
-      "fitted_stats": {
-        "r_lag_brain": 0.8763159879210101,
-        "r_lag_scalp": 0.45370388908044357,
-        "r_zero_brain": 0.8437132219676823,
-        "r_transition": 0.9182613142686482,
-        "r_group_brain": 0.9242297250233822,
-        "r_group_scalp": 0.5444157670136256,
-        "lag_brain_s": 15.125,
-        "gap": -0.00029537709628421616,
-        "identified": 1.0
-      },
-      "scalp_loss": 0.025356589176479,
-      "targets": {
-        "r_lag_brain": 0.912,
-        "r_lag_scalp": 0.494,
-        "r_zero_brain": 0.826,
-        "r_transition": 0.878,
-        "r_group_brain": 0.915,
-        "r_group_scalp": 0.43
-      },
-      "gap_bounds": {
-        "min": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.08926348232851981,
-            "bf_noise": 0.22965225953444687,
-            "bf_lag_s": 18.264586212406357,
-            "bf_drift": -0.6120896377677529,
-            "scalp_amp": 4.996532218066045,
-            "scalp_tau_s": 199.98749586172121
-          },
-          "stats": {
-            "r_lag_brain": 0.8763159879210101,
-            "r_lag_scalp": 0.45370388908044357,
-            "r_zero_brain": 0.8437132219676823,
-            "r_transition": 0.9182613142686482,
-            "r_group_brain": 0.9242297250233822,
-            "r_group_scalp": 0.5444157670136256,
-            "lag_brain_s": 15.125,
-            "gap": -0.00029537709628421616,
-            "identified": 1.0
-          },
-          "chi2": 578.4748391360969,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8766175646071127,
-            "mixed": 0.8760374983855397,
-            "gap": 0.0007011715255947903,
-            "power_gap": 0.075,
-            "identified": 1.0,
-            "resid_gap": -0.006510279464639723,
-            "power_resid_gap": 0.025,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.2
-          }
-        },
-        "max": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.08926348232851981,
-            "bf_noise": 0.22965225953444687,
-            "bf_lag_s": 18.264586212406357,
-            "bf_drift": -0.6120896377677529,
-            "scalp_amp": 4.996532218066045,
-            "scalp_tau_s": 199.98749586172121
-          },
-          "stats": {
-            "r_lag_brain": 0.8763159879210101,
-            "r_lag_scalp": 0.45370388908044357,
-            "r_zero_brain": 0.8437132219676823,
-            "r_transition": 0.9182613142686482,
-            "r_group_brain": 0.9242297250233822,
-            "r_group_scalp": 0.5444157670136256,
-            "lag_brain_s": 15.125,
-            "gap": -0.00029537709628421616,
-            "identified": 1.0
-          },
-          "chi2": 578.4748391360969,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8766175646071127,
-            "mixed": 0.8760374983855397,
-            "gap": 0.0007011715255947903,
-            "power_gap": 0.075,
-            "identified": 1.0,
-            "resid_gap": -0.006510279464639723,
-            "power_resid_gap": 0.025,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.2
-          }
-        }
-      }
-    },
-    {
-      "protocol": "hdt",
-      "mix": 0.5,
-      "params": {
-        "block_s": 180.0,
-        "tau_brain_s": [
-          14.426950408889635,
-          28.85390081777927
-        ],
-        "band_hz": [
-          0.01,
-          0.12
-        ],
-        "gap_s": [
-          8.0,
-          20.0
-        ],
-        "phys_share": 0.5,
-        "white_noise": 0.05,
-        "brain_noise": 0.024449265100639862,
-        "bf_noise": 0.1820964433298547,
-        "bf_lag_s": 23.6225953282511,
-        "bf_drift": -0.6204242186469578,
-        "scalp_amp": 4.996039436449822,
-        "scalp_tau_s": 199.98572170230636
-      },
-      "chi2": 552.6446600063346,
-      "consistent": false,
-      "se": {
-        "r_lag_brain": 0.007246415476626843,
-        "r_zero_brain": 0.009578150768364085,
-        "r_transition": 0.02862897168765353,
-        "r_group_brain": 0.006590674522690994,
-        "r_lag_scalp": 0.01001602988837562,
-        "r_group_scalp": 0.02789684389272998,
-        "lag_brain_s": 1.0
-      },
-      "fitted_stats": {
-        "r_lag_brain": 0.8947716396585224,
-        "r_lag_scalp": 0.4669738584207014,
-        "r_zero_brain": 0.8353368424608234,
-        "r_transition": 0.9497041654705123,
-        "r_group_brain": 0.9238491124982731,
-        "r_group_scalp": 0.5552112539682591,
-        "lag_brain_s": 20.25,
-        "gap": 0.0008347339861547592,
-        "identified": 1.0
-      },
-      "scalp_loss": 0.028786805119683994,
-      "targets": {
-        "r_lag_brain": 0.912,
-        "r_lag_scalp": 0.494,
-        "r_zero_brain": 0.826,
-        "r_transition": 0.878,
-        "r_group_brain": 0.915,
-        "r_group_scalp": 0.43
-      },
-      "gap_bounds": {
-        "min": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.010331220856661756,
-            "bf_noise": 0.1824001777452894,
-            "bf_lag_s": 22.694116044250745,
-            "bf_drift": -0.6265350001771138,
-            "scalp_amp": 4.996039436449822,
-            "scalp_tau_s": 199.98572170230636
-          },
-          "stats": {
-            "r_lag_brain": 0.8936801658677838,
-            "r_lag_scalp": 0.4624401607573242,
-            "r_zero_brain": 0.8396408431525548,
-            "r_transition": 0.9498240535569352,
-            "r_group_brain": 0.9223887636116964,
-            "r_group_scalp": 0.5500826987714382,
-            "lag_brain_s": 19.375,
-            "gap": 0.0005421349823145905,
-            "identified": 1.0
-          },
-          "chi2": 551.8374869577947,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8952101354126509,
-            "mixed": 0.8941149562629032,
-            "gap": 0.0012294044097986845,
-            "power_gap": 0.425,
-            "identified": 1.0,
-            "resid_gap": -0.006453605564322361,
-            "power_resid_gap": 0.0,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.175
-          }
-        },
-        "max": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.026618592173191156,
-            "bf_noise": 0.18252796607173308,
-            "bf_lag_s": 23.737999716860138,
-            "bf_drift": -0.6234808969145148,
-            "scalp_amp": 4.996039436449822,
-            "scalp_tau_s": 199.98572170230636
-          },
-          "stats": {
-            "r_lag_brain": 0.8939406125110174,
-            "r_lag_scalp": 0.4659150920252878,
-            "r_zero_brain": 0.8339300750707935,
-            "r_transition": 0.9491667433230193,
-            "r_group_brain": 0.9231598854968524,
-            "r_group_scalp": 0.5539916022430147,
-            "lag_brain_s": 20.625,
-            "gap": 0.0008937672526754536,
-            "identified": 1.25
-          },
-          "chi2": 551.8904326990144,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8954336041847707,
-            "mixed": 0.8941423945830798,
-            "gap": 0.0013189888969703245,
-            "power_gap": 0.55,
-            "identified": 1.0,
-            "resid_gap": -0.0035158884278374894,
-            "power_resid_gap": 0.0,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.175
-          }
-        }
-      }
-    },
-    {
-      "protocol": "hdt",
-      "mix": 1.0,
-      "params": {
-        "block_s": 180.0,
-        "tau_brain_s": [
-          14.426950408889635,
-          28.85390081777927
-        ],
-        "band_hz": [
-          0.01,
-          0.12
-        ],
-        "gap_s": [
-          8.0,
-          20.0
-        ],
-        "phys_share": 0.5,
-        "white_noise": 0.05,
-        "brain_noise": 0.01905480460943527,
-        "bf_noise": 0.2116473402451071,
-        "bf_lag_s": 21.996474509242663,
-        "bf_drift": -0.6252264734344664,
-        "scalp_amp": 4.996532218066045,
-        "scalp_tau_s": 199.98749586172121
-      },
-      "chi2": 406.544411236357,
-      "consistent": false,
-      "se": {
-        "r_lag_brain": 0.01021511100118793,
-        "r_zero_brain": 0.008084848794737866,
-        "r_transition": 0.02770016352176997,
-        "r_group_brain": 0.0075683849809798365,
-        "r_lag_scalp": 0.008520440779849746,
-        "r_group_scalp": 0.0269174010889897,
-        "lag_brain_s": 1.0
-      },
-      "fitted_stats": {
-        "r_lag_brain": 0.884638561370636,
-        "r_lag_scalp": 0.4601775331676041,
-        "r_zero_brain": 0.8305042041376983,
-        "r_transition": 0.9362765189933691,
-        "r_group_brain": 0.9221423169354672,
-        "r_group_scalp": 0.549376138370988,
-        "lag_brain_s": 18.625,
-        "gap": 0.00131031393159807,
-        "identified": 1.25
-      },
-      "scalp_loss": 0.026753370667265908,
-      "targets": {
-        "r_lag_brain": 0.912,
-        "r_lag_scalp": 0.494,
-        "r_zero_brain": 0.826,
-        "r_transition": 0.878,
-        "r_group_brain": 0.915,
-        "r_group_scalp": 0.43
-      },
-      "gap_bounds": {
-        "min": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.013182324141715275,
-            "bf_noise": 0.20941935132262518,
-            "bf_lag_s": 22.136222282117615,
-            "bf_drift": -0.6329034056751961,
-            "scalp_amp": 4.996532218066045,
-            "scalp_tau_s": 199.98749586172121
-          },
-          "stats": {
-            "r_lag_brain": 0.8838658245791596,
-            "r_lag_scalp": 0.457588565931515,
-            "r_zero_brain": 0.8293052217173971,
-            "r_transition": 0.9372507464695609,
-            "r_group_brain": 0.9204621511282713,
-            "r_group_scalp": 0.5460284231401885,
-            "lag_brain_s": 18.625,
-            "gap": 0.0011464006790999348,
-            "identified": 1.0
-          },
-          "chi2": 406.4217497229022,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8858348471977873,
-            "mixed": 0.8839278378905802,
-            "gap": 0.0016821087601172902,
-            "power_gap": 0.575,
-            "identified": 1.5,
-            "resid_gap": -0.005967381266303799,
-            "power_resid_gap": 0.0,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.175
-          }
-        },
-        "max": {
-          "params": {
-            "block_s": 180.0,
-            "tau_brain_s": [
-              14.426950408889635,
-              28.85390081777927
-            ],
-            "band_hz": [
-              0.01,
-              0.12
-            ],
-            "gap_s": [
-              8.0,
-              20.0
-            ],
-            "phys_share": 0.5,
-            "white_noise": 0.05,
-            "brain_noise": 0.025461607250988456,
-            "bf_noise": 0.20838898613264176,
-            "bf_lag_s": 22.058429056838254,
-            "bf_drift": -0.6276699929801123,
-            "scalp_amp": 4.996532218066045,
-            "scalp_tau_s": 199.98749586172121
-          },
-          "stats": {
-            "r_lag_brain": 0.8850753916122958,
-            "r_lag_scalp": 0.45972723854564745,
-            "r_zero_brain": 0.8305714899757377,
-            "r_transition": 0.9373154366441394,
-            "r_group_brain": 0.9216451588710746,
-            "r_group_scalp": 0.5483411119055102,
-            "lag_brain_s": 18.875,
-            "gap": 0.0015225742820029198,
-            "identified": 1.5
-          },
-          "chi2": 406.07116362698605,
-          "prediction": {
-            "studies": 40,
-            "real": 0.8870276351211173,
-            "mixed": 0.8847078812689496,
-            "gap": 0.001994789594011226,
-            "power_gap": 0.8,
-            "identified": 2.0,
-            "resid_gap": -0.0042455364565779224,
-            "power_resid_gap": 0.0,
-            "share_brain_gt_scalp_real": 1.0,
-            "share_brain_gt_scalp_gap": 0.175
-          }
-        }
-      }
-    },
     {
       "protocol": "squat",
       "mix": 0.0,
@@ -1438,6 +990,525 @@
             "power_gap": 1.0,
             "identified": 12.5,
             "resid_gap": 0.07627532540706915,
+            "power_resid_gap": 1.0,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 1.0
+          }
+        }
+      }
+    },
+    {
+      "protocol": "hdt",
+      "mix": 0.0,
+      "params": {
+        "block_s": 180.0,
+        "tau_brain_s": [
+          14.426950408889635,
+          28.85390081777927
+        ],
+        "band_hz": [
+          0.01,
+          0.12
+        ],
+        "gap_s": [
+          8.0,
+          20.0
+        ],
+        "phys_share": 0.5,
+        "white_noise": 0.05,
+        "brain_noise": 0.024788105421547735,
+        "bf_noise": 0.015046608282640653,
+        "bf_lag_s": 15.136129979545329,
+        "bf_drift": 0.0015214054248131603,
+        "bf_tau_s": 0.0,
+        "brain_fast_share": 0.9901406910235725,
+        "brain_adapt": 0.206365095100781,
+        "brain_adapt_tau_s": 27.668933081921793,
+        "bf_transient": 1.0031453505714842,
+        "scalp_amp": 3.5128721400520435,
+        "scalp_tau_s": 199.9999124935537
+      },
+      "chi2": 1.0962427443545997,
+      "consistent": true,
+      "se": {
+        "r_lag_brain": 0.01915282939011331,
+        "r_zero_brain": 0.011442678860999459,
+        "r_transition": 0.022737110573865314,
+        "r_group_brain": 0.018965397465952615,
+        "r_lag_scalp": 0.009015931370223704,
+        "r_group_scalp": 0.03232265631656979,
+        "lag_brain_s": 1.0
+      },
+      "fitted_stats": {
+        "r_lag_brain": 0.9110774932337902,
+        "r_lag_scalp": 0.4753890621954655,
+        "r_zero_brain": 0.8260694418353843,
+        "r_transition": 0.8773981791992551,
+        "r_group_brain": 0.9148820455312013,
+        "r_group_scalp": 0.6065719244187988,
+        "lag_brain_s": 15.0,
+        "gap": -0.0004884461466559686,
+        "identified": 0.75
+      },
+      "scalp_loss": 0.05992459694387359,
+      "targets": {
+        "r_lag_brain": 0.912,
+        "r_lag_scalp": 0.494,
+        "r_zero_brain": 0.826,
+        "r_transition": 0.878,
+        "r_group_brain": 0.915,
+        "r_group_scalp": 0.43
+      },
+      "gap_bounds": {
+        "min": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.024788105421547735,
+            "bf_noise": 0.015046608282640653,
+            "bf_lag_s": 15.136129979545329,
+            "bf_drift": 0.0015214054248131603,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.9901406910235725,
+            "brain_adapt": 0.206365095100781,
+            "brain_adapt_tau_s": 27.668933081921793,
+            "bf_transient": 1.0031453505714842,
+            "scalp_amp": 3.5128721400520435,
+            "scalp_tau_s": 199.9999124935537
+          },
+          "stats": {
+            "r_lag_brain": 0.9110774932337902,
+            "r_lag_scalp": 0.4753890621954655,
+            "r_zero_brain": 0.8260694418353843,
+            "r_transition": 0.8773981791992551,
+            "r_group_brain": 0.9148820455312013,
+            "r_group_scalp": 0.6065719244187988,
+            "lag_brain_s": 15.0,
+            "gap": -0.0004884461466559686,
+            "identified": 0.75
+          },
+          "chi2": 1.0962427443545997,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9109793480458142,
+            "mixed": 0.9114207471838314,
+            "gap": -0.0005041675025403702,
+            "power_gap": 0.0,
+            "identified": 1.0,
+            "resid_gap": -6.010424813747764e-05,
+            "power_resid_gap": 0.0,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 0.0
+          }
+        },
+        "max": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.024788105421547735,
+            "bf_noise": 0.015046608282640653,
+            "bf_lag_s": 15.136129979545329,
+            "bf_drift": 0.0015214054248131603,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.9901406910235725,
+            "brain_adapt": 0.206365095100781,
+            "brain_adapt_tau_s": 27.668933081921793,
+            "bf_transient": 1.0031453505714842,
+            "scalp_amp": 3.5128721400520435,
+            "scalp_tau_s": 199.9999124935537
+          },
+          "stats": {
+            "r_lag_brain": 0.9110774932337902,
+            "r_lag_scalp": 0.4753890621954655,
+            "r_zero_brain": 0.8260694418353843,
+            "r_transition": 0.8773981791992551,
+            "r_group_brain": 0.9148820455312013,
+            "r_group_scalp": 0.6065719244187988,
+            "lag_brain_s": 15.0,
+            "gap": -0.0004884461466559686,
+            "identified": 0.75
+          },
+          "chi2": 1.0962427443545997,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9109793480458142,
+            "mixed": 0.9114207471838314,
+            "gap": -0.0005041675025403702,
+            "power_gap": 0.0,
+            "identified": 1.0,
+            "resid_gap": -6.010424813747764e-05,
+            "power_resid_gap": 0.0,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 0.0
+          }
+        }
+      }
+    },
+    {
+      "protocol": "hdt",
+      "mix": 0.5,
+      "params": {
+        "block_s": 180.0,
+        "tau_brain_s": [
+          14.426950408889635,
+          28.85390081777927
+        ],
+        "band_hz": [
+          0.01,
+          0.12
+        ],
+        "gap_s": [
+          8.0,
+          20.0
+        ],
+        "phys_share": 0.5,
+        "white_noise": 0.05,
+        "brain_noise": 0.05680124129175226,
+        "bf_noise": 0.020777714966504247,
+        "bf_lag_s": 14.260164615962038,
+        "bf_drift": -0.006319266625284481,
+        "bf_tau_s": 0.0,
+        "brain_fast_share": 0.9860247899892097,
+        "brain_adapt": 0.2476811167675145,
+        "brain_adapt_tau_s": 40.77319277108815,
+        "bf_transient": 0.9987398643991061,
+        "scalp_amp": 4.308615635588477,
+        "scalp_tau_s": 199.99996078742782
+      },
+      "chi2": 1.304532539865216,
+      "consistent": true,
+      "se": {
+        "r_lag_brain": 0.019134014897320646,
+        "r_zero_brain": 0.011855001802660893,
+        "r_transition": 0.021080171918756184,
+        "r_group_brain": 0.018802196125861235,
+        "r_lag_scalp": 0.007845385377731894,
+        "r_group_scalp": 0.03032306619721642,
+        "lag_brain_s": 1.0
+      },
+      "fitted_stats": {
+        "r_lag_brain": 0.9094765310673976,
+        "r_lag_scalp": 0.4832754117979831,
+        "r_zero_brain": 0.8290051585195517,
+        "r_transition": 0.8791761784521164,
+        "r_group_brain": 0.9150169186337708,
+        "r_group_scalp": 0.5775088957602318,
+        "lag_brain_s": 14.0,
+        "gap": 0.0008929453464958936,
+        "identified": 2.25
+      },
+      "scalp_loss": 0.039727983168137804,
+      "targets": {
+        "r_lag_brain": 0.912,
+        "r_lag_scalp": 0.494,
+        "r_zero_brain": 0.826,
+        "r_transition": 0.878,
+        "r_group_brain": 0.915,
+        "r_group_scalp": 0.43
+      },
+      "gap_bounds": {
+        "min": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.011530719942367975,
+            "bf_noise": 0.08097449439364472,
+            "bf_lag_s": 15.902088790943639,
+            "bf_drift": 0.018710686380233987,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.9986049185734049,
+            "brain_adapt": 0.208940136635618,
+            "brain_adapt_tau_s": 11.059897358949584,
+            "bf_transient": 0.9377166532641774,
+            "scalp_amp": 4.308615635588477,
+            "scalp_tau_s": 199.99996078742782
+          },
+          "stats": {
+            "r_lag_brain": 0.9073135958521714,
+            "r_lag_scalp": 0.5350819608532944,
+            "r_zero_brain": 0.8193841859195989,
+            "r_transition": 0.8747208244568342,
+            "r_group_brain": 0.9181788371125219,
+            "r_group_scalp": 0.6432709885355149,
+            "lag_brain_s": 15.875,
+            "gap": -0.0012220516422102312,
+            "identified": 1.25
+          },
+          "chi2": 10.08272645748486,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9099482658419897,
+            "mixed": 0.9099199446256958,
+            "gap": -0.0002619029110936255,
+            "power_gap": 0.0,
+            "identified": 1.0,
+            "resid_gap": -0.002308132402568202,
+            "power_resid_gap": 0.0,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 0.0
+          }
+        },
+        "max": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.15276986125716152,
+            "bf_noise": 0.010175898158085513,
+            "bf_lag_s": 14.299147126390006,
+            "bf_drift": -0.010681929681639168,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.8398527900188069,
+            "brain_adapt": 0.15573137190228428,
+            "brain_adapt_tau_s": 41.61970613982227,
+            "bf_transient": 1.0066028959759032,
+            "scalp_amp": 4.308615635588477,
+            "scalp_tau_s": 199.99996078742782
+          },
+          "stats": {
+            "r_lag_brain": 0.9047345442135701,
+            "r_lag_scalp": 0.5231984390590555,
+            "r_zero_brain": 0.8284774668705679,
+            "r_transition": 0.8749081885176265,
+            "r_group_brain": 0.9207202321931947,
+            "r_group_scalp": 0.6264712943402235,
+            "lag_brain_s": 14.0,
+            "gap": 0.009899569990559479,
+            "identified": 6.0
+          },
+          "chi2": 9.290909657658691,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9037599795211031,
+            "mixed": 0.8938477053657738,
+            "gap": 0.009873899715730161,
+            "power_gap": 1.0,
+            "identified": 6.0,
+            "resid_gap": 0.028156566566725962,
+            "power_resid_gap": 0.85,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 1.0
+          }
+        }
+      }
+    },
+    {
+      "protocol": "hdt",
+      "mix": 1.0,
+      "params": {
+        "block_s": 180.0,
+        "tau_brain_s": [
+          14.426950408889635,
+          28.85390081777927
+        ],
+        "band_hz": [
+          0.01,
+          0.12
+        ],
+        "gap_s": [
+          8.0,
+          20.0
+        ],
+        "phys_share": 0.5,
+        "white_noise": 0.05,
+        "brain_noise": 0.09806166364685774,
+        "bf_noise": 0.023785103519189065,
+        "bf_lag_s": 14.558568467957581,
+        "bf_drift": -0.07011657974158725,
+        "bf_tau_s": 0.0,
+        "brain_fast_share": 0.9992692549600948,
+        "brain_adapt": 0.14046893748195624,
+        "brain_adapt_tau_s": 37.144138602566386,
+        "bf_transient": 1.0642188842723805,
+        "scalp_amp": 3.965697284170797,
+        "scalp_tau_s": 199.999867368493
+      },
+      "chi2": 1.2250005561352073,
+      "consistent": true,
+      "se": {
+        "r_lag_brain": 0.01822304085884212,
+        "r_zero_brain": 0.013661914181547533,
+        "r_transition": 0.017339939832757778,
+        "r_group_brain": 0.018396598822728892,
+        "r_lag_scalp": 0.0075829701973014856,
+        "r_group_scalp": 0.032972466760928645,
+        "lag_brain_s": 1.0
+      },
+      "fitted_stats": {
+        "r_lag_brain": 0.9089059619703159,
+        "r_lag_scalp": 0.48000008492307306,
+        "r_zero_brain": 0.8272908332339559,
+        "r_transition": 0.8780409964930839,
+        "r_group_brain": 0.9158847873104352,
+        "r_group_scalp": 0.5893371036603091,
+        "lag_brain_s": 14.25,
+        "gap": 0.007570537660010784,
+        "identified": 8.75
+      },
+      "scalp_loss": 0.047318767898758385,
+      "targets": {
+        "r_lag_brain": 0.912,
+        "r_lag_scalp": 0.494,
+        "r_zero_brain": 0.826,
+        "r_transition": 0.878,
+        "r_group_brain": 0.915,
+        "r_group_scalp": 0.43
+      },
+      "gap_bounds": {
+        "min": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.011839890638113245,
+            "bf_noise": 0.09165445687527891,
+            "bf_lag_s": 14.659427844019019,
+            "bf_drift": 0.183256268686931,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.9956846862939295,
+            "brain_adapt": 0.07324000134386922,
+            "brain_adapt_tau_s": 191.0036800343575,
+            "bf_transient": 1.142048519306171,
+            "scalp_amp": 3.965697284170797,
+            "scalp_tau_s": 199.999867368493
+          },
+          "stats": {
+            "r_lag_brain": 0.9062280610749217,
+            "r_lag_scalp": 0.5543673300080056,
+            "r_zero_brain": 0.8354846386618158,
+            "r_transition": 0.8767830351305272,
+            "r_group_brain": 0.9150566909235329,
+            "r_group_scalp": 0.6833382767918394,
+            "lag_brain_s": 14.875,
+            "gap": -0.001043733799575161,
+            "identified": 1.0
+          },
+          "chi2": 9.21537657925926,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9081686739273274,
+            "mixed": 0.9082587597125982,
+            "gap": -6.031444018742005e-05,
+            "power_gap": 0.0,
+            "identified": 1.0,
+            "resid_gap": -0.002046385545655425,
+            "power_resid_gap": 0.0,
+            "share_brain_gt_scalp_real": 1.0,
+            "share_brain_gt_scalp_gap": 0.0
+          }
+        },
+        "max": {
+          "params": {
+            "block_s": 180.0,
+            "tau_brain_s": [
+              14.426950408889635,
+              28.85390081777927
+            ],
+            "band_hz": [
+              0.01,
+              0.12
+            ],
+            "gap_s": [
+              8.0,
+              20.0
+            ],
+            "phys_share": 0.5,
+            "white_noise": 0.05,
+            "brain_noise": 0.20373019412821938,
+            "bf_noise": 0.01069848830805016,
+            "bf_lag_s": 12.708758862994422,
+            "bf_drift": -0.233805253976204,
+            "bf_tau_s": 0.0,
+            "brain_fast_share": 0.7759280818099872,
+            "brain_adapt": 0.07960651892150045,
+            "brain_adapt_tau_s": 198.6406793536031,
+            "bf_transient": 1.0516316657002638,
+            "scalp_amp": 3.965697284170797,
+            "scalp_tau_s": 199.999867368493
+          },
+          "stats": {
+            "r_lag_brain": 0.9030324878764008,
+            "r_lag_scalp": 0.45316420614880737,
+            "r_zero_brain": 0.8248390835621497,
+            "r_transition": 0.8786585770404897,
+            "r_group_brain": 0.9189202249270174,
+            "r_group_scalp": 0.5660536392526619,
+            "lag_brain_s": 12.875,
+            "gap": 0.029387920991605712,
+            "identified": 19.5
+          },
+          "chi2": 10.949660038918221,
+          "prediction": {
+            "studies": 40,
+            "real": 0.9025084262082301,
+            "mixed": 0.8726452091394249,
+            "gap": 0.030066833935294995,
+            "power_gap": 1.0,
+            "identified": 19.0,
+            "resid_gap": 0.16649476287360435,
             "power_resid_gap": 1.0,
             "share_brain_gt_scalp_real": 1.0,
             "share_brain_gt_scalp_gap": 1.0

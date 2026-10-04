@@ -46,6 +46,7 @@ from scipy import signal
 from shared_maneuver_test import Session, fmt_p, lowpass1, run
 
 FIT_FILE = Path(__file__).with_name("paper_fit.json")
+FAST_TAU_S = 2.0  # time constant of the fast (hydrostatic) brain component
 
 
 @dataclass(frozen=True)
@@ -80,6 +81,24 @@ class SimParams:
     # shape difference; it is shared by every session, so it lowers real- and
     # mixed-pair r alike and cannot create or hide a gap.
     bf_drift: float = 0.0
+    # optional, fitted when enabled (head-down tilt): Temple-BF's own response
+    # smoothing, first-order time constant in s (0 = none). With smoothing,
+    # part of the 13-15 s lag is the device's sluggishness, not pure delay.
+    bf_tau_s: float = 0.0
+    # optional, fitted when enabled (head-down tilt): share of the brain
+    # response that follows the maneuver within ~2 s (a hydrostatic shift),
+    # the rest rising with tau_brain_s. 0 = single slow response.
+    brain_fast_share: float = 0.0
+    # optional, fitted when enabled (head-down tilt): partial adaptation of
+    # the brain response - after its peak it declines by this share of the
+    # step, with time constant brain_adapt_tau_s. Motivated by Sec. 3.1, which
+    # places the peak at 60-90 s inside 180 s blocks rather than at the end.
+    brain_adapt: float = 0.0
+    brain_adapt_tau_s: float = 60.0
+    # optional, fitted when enabled (head-down tilt): a short transient in
+    # Temple-BF at every block transition (same sign at onset and offset, as a
+    # movement-related artefact would be), in task-response units.
+    bf_transient: float = 0.0
     # fitted: scalp task-response amplitude (signed) relative to its own noise SD
     scalp_amp: float = 1.0
     # fitted: scalp response time constant, s
@@ -152,7 +171,15 @@ def assemble_session(protocol: str, idx: int, p: SimParams, mix: float, d: dict,
     # session-specific physiology (inversion noise remains).
     tau_mean = float(np.mean(p.tau_brain_s))
     tau_b = tau_mean + individuality * (d["tau_brain"] - tau_mean)
-    brain_phys = lowpass1(task, tau_b) + individuality * p.brain_noise * math.sqrt(p.phys_share) * d["phys"]
+    fast = p.brain_fast_share * lowpass1(task, FAST_TAU_S) if p.brain_fast_share else 0.0
+
+    def response(tau):
+        r = fast + (1 - p.brain_fast_share) * lowpass1(task, tau)
+        if p.brain_adapt:
+            r = r - p.brain_adapt * lowpass1(r, p.brain_adapt_tau_s)
+        return r
+
+    brain_phys = response(tau_b) + individuality * p.brain_noise * math.sqrt(p.phys_share) * d["phys"]
     inversion = p.brain_noise * math.sqrt(1 - p.phys_share) * d["inversion"]
     brain_hbo = brain_phys + inversion + p.white_noise * d["white"][0]
 
@@ -161,11 +188,17 @@ def assemble_session(protocol: str, idx: int, p: SimParams, mix: float, d: dict,
 
     # Temple-BF: the average brain response plus a share `mix` of this
     # session's deviation from it, delayed; a shared drift; its own noise.
-    core = (1 - mix) * lowpass1(task, tau_mean) + mix * brain_phys
+    core = (1 - mix) * response(tau_mean) + mix * brain_phys
+    if p.bf_tau_s > 0:
+        core = lowpass1(core, p.bf_tau_s)
     ev = d["events"]
     ramp = np.clip((d["t"] - ev[0]) / (ev[-1] - ev[0]), 0.0, 1.0)
     temple_bf = (delay(core, p.bf_lag_s) + p.bf_drift * ramp + p.bf_noise * d["bf"]
                  + p.white_noise * d["white"][2])
+    if p.bf_transient:
+        moving = np.abs(np.gradient(task))  # nonzero while the posture changes
+        bump = lowpass1(lowpass1(moving, 5.0), 5.0)
+        temple_bf = temple_bf + p.bf_transient * bump / bump.max()
 
     return Session(
         session_id=f"{protocol}_{idx:02d}",

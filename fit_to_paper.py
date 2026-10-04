@@ -206,40 +206,81 @@ def chi2(stats: dict[str, float], targets: dict[str, float], se: dict[str, float
     return err + ((stats["lag_brain_s"] - np.mean(PAPER_LAG_RANGE_S)) / se["lag_brain_s"]) ** 2
 
 
+SEARCH_EFFORT = 1.0  # multiplies every differential-evolution budget (--search-effort)
+
+
+def _set_effort(effort: float) -> None:
+    global SEARCH_EFFORT
+    SEARCH_EFFORT = effort
+
+
 def _de(objective, bounds, x0=None, seed=0, maxiter=30):
     """Differential evolution (global, gradient-free). The objective is
     deterministic (common random numbers) but not smooth - it is built from
     medians and lag maxima - so local simplex searches get stuck."""
     return optimize.differential_evolution(
-        objective, bounds, x0=x0, seed=seed, popsize=8, maxiter=maxiter, tol=1e-4, polish=False,
+        objective, bounds, x0=x0, seed=seed, popsize=8, maxiter=int(maxiter * SEARCH_EFFORT), tol=1e-4,
+        polish=False,
     )
 
 
-BRAIN_BOUNDS = [(math.log(0.01), math.log(3.0)), (math.log(0.01), math.log(3.0)), (0.0, 30.0), (-3.0, 3.0)]
+# Stage-1 parameters: (name, lower, upper, searched on a log scale).
+BRAIN_SPEC = [
+    ("brain_noise", 0.01, 3.0, True),
+    ("bf_noise", 0.01, 3.0, True),
+    ("bf_lag_s", 0.0, 30.0, False),
+    ("bf_drift", -3.0, 3.0, False),
+]
+# Extra mechanisms fitted only where the base model cannot reproduce the
+# paper. For head-down tilt no version of the base model comes close
+# (chi-square 400-580); a screen of candidate mechanisms
+# (results/hdt_screen.txt) found that only models with a Temple-BF
+# transient at each transition get close. Temple-BF includes heart-rate
+# features (Sec. 2.2.1) and heart rate changes abruptly at every tilt
+# transition (Fig. 4A). The brain-response shape is bounded by Fig. 3A: in
+# head-down tilt brain dHbO rises almost at once (fast share free) and
+# declines only ~12% within a block (adaptation capped at 25%).
+EXTRA_SPEC: dict[str, list] = {
+    "hdt": [
+        ("brain_fast_share", 0.0, 1.0, False),
+        ("brain_adapt", 0.0, 0.25, False),
+        ("brain_adapt_tau_s", 10.0, 200.0, False),
+        ("bf_transient", -2.0, 2.0, False),
+    ],
+}
 SCALP_BOUNDS = [(-5.0, 5.0), (math.log(1.0), math.log(200.0))]
 
 
-def _brain(base: SimParams, x) -> SimParams:
-    return replace(base, brain_noise=float(np.exp(x[0])), bf_noise=float(np.exp(x[1])),
-                   bf_lag_s=float(x[2]), bf_drift=float(x[3]))
+def _spec(protocol: str) -> list:
+    return BRAIN_SPEC + EXTRA_SPEC.get(protocol, [])
 
 
-def _brain_x(p: SimParams) -> np.ndarray:
-    return np.array([math.log(p.brain_noise), math.log(p.bf_noise), p.bf_lag_s, p.bf_drift])
+def _bounds(spec) -> list:
+    return [(math.log(lo), math.log(hi)) if lg else (lo, hi) for _, lo, hi, lg in spec]
+
+
+def _brain(base: SimParams, x, spec) -> SimParams:
+    return replace(base, **{n: float(np.exp(v)) if lg else float(v) for (n, _, _, lg), v in zip(spec, x)})
+
+
+def _brain_x(p: SimParams, spec) -> np.ndarray:
+    return np.array([math.log(getattr(p, n)) if lg else getattr(p, n) for n, _, _, lg in spec])
 
 
 def fit_one(job: tuple[str, float, SimParams, bool]) -> dict:
     protocol, mix, base, with_bounds = job
     targets = PAPER_TARGETS[protocol]
     stats = lambda p: statistics_over_seeds(p, protocol, mix)  # noqa: E731
+    spec = _spec(protocol)
+    bounds = _bounds(spec)
 
     # 1. Point fit in Fisher-z units, then standard errors at that point,
     #    then refit in standard-error units.
-    p0 = _brain(base, _de(lambda x: raw_loss(stats(_brain(base, x)), targets, BRAIN_KEYS), BRAIN_BOUNDS).x)
+    p0 = _brain(base, _de(lambda x: raw_loss(stats(_brain(base, x, spec)), targets, BRAIN_KEYS), bounds).x, spec)
     se = standard_errors(p0, protocol, mix)
-    obj = lambda x: chi2(stats(_brain(base, x)), targets, se)  # noqa: E731
-    best = _de(obj, BRAIN_BOUNDS, x0=_brain_x(p0), maxiter=20)
-    p1 = _brain(base, best.x)
+    obj = lambda x: chi2(stats(_brain(base, x, spec)), targets, se)  # noqa: E731
+    best = _de(obj, bounds, x0=_brain_x(p0, spec), maxiter=20)
+    p1 = _brain(base, best.x, spec)
     chi2_min = float(best.fun)
     consistent = chi2_min <= CHI2_95_DF5
 
@@ -261,11 +302,11 @@ def fit_one(job: tuple[str, float, SimParams, bool]) -> dict:
             continue
 
         def bound_obj(x, sign=sign):
-            st = stats(_brain(base, x))
+            st = stats(_brain(base, x, spec))
             return sign * st["gap"] + 100.0 * max(0.0, chi2(st, targets, se) - limit)
 
-        res = _de(bound_obj, BRAIN_BOUNDS, x0=_brain_x(p1), maxiter=25)
-        ends[name] = scalp(_brain(base, res.x), scalp_x)
+        res = _de(bound_obj, bounds, x0=_brain_x(p1, spec), maxiter=25)
+        ends[name] = scalp(_brain(base, res.x, spec), scalp_x)
 
     out = {
         "protocol": protocol,
@@ -325,8 +366,12 @@ def main() -> None:
     ap.add_argument("--band-low", type=float, default=0.01, help="lower edge of the fluctuation band, Hz")
     ap.add_argument("--gap", default="8,20", help="assumed transition gap range, s")
     ap.add_argument("--studies", type=int, default=40, help="simulated studies per prediction")
+    ap.add_argument("--search-effort", type=float, default=1.0,
+                    help="multiply the optimiser budget (use >1 for protocols with extra parameters)")
     ap.add_argument("--out", type=Path, default=FIT_FILE)
     args = ap.parse_args()
+    global SEARCH_EFFORT
+    SEARCH_EFFORT = args.search_effort
 
     mixes = [float(m) for m in args.mixes.split(",")]
     protocols = args.protocols.split(",")
@@ -339,7 +384,7 @@ def main() -> None:
     # w = 0 has no session-specific tracking, so its gap is zero by
     # construction; only its fit quality is of interest.
     jobs = [(p, m, bases[p], m > 0) for p in protocols for m in mixes]
-    with ProcessPoolExecutor() as ex:
+    with ProcessPoolExecutor(initializer=_set_effort, initargs=(SEARCH_EFFORT,)) as ex:
         fits = list(ex.map(fit_one, jobs))
         pred_jobs = [(f["protocol"], f["mix"], f["gap_bounds"][e]["params"], args.studies)
                      for f in fits for e in ("min", "max")]

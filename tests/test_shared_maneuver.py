@@ -139,3 +139,24 @@ def test_paper_statistics_recover_noise_free_truth():
     assert st["r_transition"] > 0.99  # lag-aligned windows
     assert st["r_group_brain"] > 0.99
     assert st["r_zero_brain"] < st["r_lag_brain"]
+
+
+def _noise_free(**kw):
+    p = replace(default_params()["hdt"], brain_noise=0.0, bf_noise=0.0, white_noise=0.0, **kw)
+    return simulate_dataset(0.0, {"hdt": p}, n_sessions=1, seed=0, protocols=("hdt",))[0]
+
+
+def test_head_down_tilt_mechanisms_have_the_intended_shape():
+    s = _noise_free(brain_fast_share=1.0, brain_adapt=0.2, brain_adapt_tau_s=30.0, bf_transient=0.8, bf_lag_s=14.0)
+    ev, brain, bf = s.events, s.signals["brain_hbo"], s.signals["temple_bf"]
+    onset = int(ev[2])  # start of the first head-down block
+    peak = brain[onset : onset + 30].max()
+    assert brain[onset + 5] > 0.8 * peak  # fast rise
+    assert brain[int(ev[3]) - 1] == pytest.approx(0.8, abs=0.05)  # 20% adaptation by block end
+    # The transient sits at the transitions: during the first transition gap
+    # BF moves before its delayed response arrives.
+    plain = _noise_free(brain_fast_share=1.0, brain_adapt=0.2, brain_adapt_tau_s=30.0, bf_lag_s=14.0)
+    extra = bf - plain.signals["temple_bf"]
+    mid_block = int((ev[2] + ev[3]) / 2)
+    assert extra[int(ev[1]) : onset + 10].max() > 0.5
+    assert abs(extra[mid_block]) < 0.01

@@ -1,0 +1,3 @@
+paper  lag 0.912 zero 0.826 trans 0.878 grp 0.915 lag 13-15
+Fig.3A-bounded + transient w=0 chi2     1.7 | lag 0.912 zero 0.834 trans 0.877 grp 0.915 lag_s 15.0 | {'brain_noise': 0.02, 'bf_noise': 0.017, 'bf_lag_s': 15.11, 'bf_drift': 0.061, 'brain_fast_share': 0.988, 'brain_adapt': 0.235, 'brain_adapt_tau_s': 117.191, 'bf_transient': 1.109}
+Fig.3A-bounded + transient w=1 chi2     1.5 | lag 0.909 zero 0.833 trans 0.876 grp 0.916 lag_s 14.0 | {'brain_noise': 0.095, 'bf_noise': 0.019, 'bf_lag_s': 14.431, 'bf_drift': -0.033, 'brain_fast_share': 0.942, 'brain_adapt': 0.189, 'brain_adapt_tau_s': 84.293, 'bf_transient': 1.092}

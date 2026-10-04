@@ -1,0 +1,9 @@
+paper  lag 0.912 zero 0.826 trans 0.878 grp 0.915 lag 13-15
+kinetics (A+B)             w=0 chi2   491.5 | lag 0.886 zero 0.826 trans 0.923 grp 0.926 lag_s 17.8 | {'brain_noise': 0.025, 'bf_noise': 0.211, 'bf_lag_s': 0.092, 'bf_drift': -0.545, 'bf_tau_s': 29.006, 'brain_fast_share': 0.854}
+kinetics (A+B)             w=1 chi2   474.4 | lag 0.882 zero 0.830 trans 0.913 grp 0.926 lag_s 19.8 | {'brain_noise': 0.03, 'bf_noise': 0.208, 'bf_lag_s': 0.132, 'bf_drift': -0.559, 'bf_tau_s': 29.572, 'brain_fast_share': 0.007}
+brain adaptation           w=0 chi2   403.6 | lag 0.881 zero 0.841 trans 0.904 grp 0.925 lag_s 17.2 | {'brain_noise': 0.016, 'bf_noise': 0.247, 'bf_lag_s': 19.44, 'bf_drift': -0.672, 'brain_adapt': 0.889, 'brain_adapt_tau_s': 183.064}
+brain adaptation           w=1 chi2   539.8 | lag 0.871 zero 0.802 trans 0.906 grp 0.917 lag_s 16.0 | {'brain_noise': 0.2, 'bf_noise': 0.209, 'bf_lag_s': 16.035, 'bf_drift': -0.7, 'brain_adapt': 0.822, 'brain_adapt_tau_s': 197.75}
+BF transition transient    w=0 chi2    43.1 | lag 0.910 zero 0.841 trans 0.879 grp 0.916 lag_s 21.2 | {'brain_noise': 0.021, 'bf_noise': 0.074, 'bf_lag_s': 20.203, 'bf_drift': 0.402, 'bf_transient': 0.954}
+BF transition transient    w=1 chi2    66.3 | lag 0.902 zero 0.836 trans 0.896 grp 0.917 lag_s 12.0 | {'brain_noise': 0.203, 'bf_noise': 0.012, 'bf_lag_s': 12.306, 'bf_drift': -0.058, 'bf_transient': -1.008}
+adaptation + transient     w=0 chi2    30.2 | lag 0.910 zero 0.833 trans 0.873 grp 0.915 lag_s 20.5 | {'brain_noise': 0.037, 'bf_noise': 0.02, 'bf_lag_s': 20.297, 'bf_drift': 0.2, 'brain_adapt': 0.654, 'brain_adapt_tau_s': 128.481, 'bf_transient': 0.879}
+adaptation + transient     w=1 chi2    10.4 | lag 0.909 zero 0.827 trans 0.881 grp 0.916 lag_s 17.1 | {'brain_noise': 0.053, 'bf_noise': 0.012, 'bf_lag_s': 17.702, 'bf_drift': -0.149, 'brain_adapt': 0.653, 'brain_adapt_tau_s': 39.74, 'bf_transient': 0.602}
