@@ -1,0 +1,22 @@
+Best fit to the paper's statistics (simulated values; paper in the first row)
+chi2 = distance in standard-error units, 5 df; consistent if <= 11.07
+
+hdt         w   lag b   lag s  zero b   trans   grp b   grp s  lag s   chi2
+paper           0.912   0.494   0.826   0.878   0.915   0.430  13-15
+         1.00   0.889   0.447   0.826   0.944   0.925   0.545   16.2  372.3
+
+squat       w   lag b   lag s  zero b   trans   grp b   grp s  lag s   chi2
+paper           0.843   0.700   0.701   0.861   0.916   0.783  13-15
+         1.00   0.843   0.680   0.702   0.862   0.916   0.855   14.0    0.0
+
+supine      w   lag b   lag s  zero b   trans   grp b   grp s  lag s   chi2
+paper           0.839   0.767   0.796   0.876   0.941   0.929  13-15
+         1.00   0.843   0.767   0.793   0.864   0.940   0.929   13.8    3.7
+
+Range of outcomes consistent with the paper (brain layer, lag-adjusted; power and identification from 40 simulated 20-session studies)
+protocol     w    gap min-max  power min-max  ident min-max      resid gap  brain>scalp gap
+hdt       1.00   0.027-0.044     1.00-1.00        19-20       0.252-0.358       1.00-1.00  
+squat     1.00   0.009-0.073     0.85-1.00         3-19       0.011-0.321       0.38-1.00  
+supine    1.00   0.010-0.035     1.00-1.00         6-17       0.030-0.152       0.78-1.00  
+
+wrote results/sens_band0003.json

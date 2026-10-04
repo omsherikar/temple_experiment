@@ -57,7 +57,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
-from scipy import stats
+from scipy import signal, stats
 
 EMA_ALPHA = 0.35
 MAX_LAG_S = 30
@@ -119,16 +119,21 @@ def load_session_file(path: Path, columns: list[str]) -> tuple[np.ndarray, dict[
 
 
 def ema_filtfilt(x: np.ndarray, alpha: float = EMA_ALPHA) -> np.ndarray:
-    """Forward-backward exponential moving average (zero phase)."""
+    """Forward-backward exponential moving average (zero phase).
+
+    One pass is y[i] = alpha * x[i] + (1 - alpha) * y[i-1], with y[0] = x[0].
+    """
 
     def ema(v):
-        out = np.empty_like(v)
-        out[0] = v[0]
-        for i in range(1, len(v)):
-            out[i] = alpha * v[i] + (1 - alpha) * out[i - 1]
-        return out
+        return signal.lfilter([alpha], [1.0, alpha - 1.0], v, zi=[(1.0 - alpha) * v[0]])[0]
 
-    return ema(ema(x)[::-1])[::-1]
+    return ema(ema(np.asarray(x, float))[::-1])[::-1]
+
+
+def lowpass1(x: np.ndarray, tau: float) -> np.ndarray:
+    """Causal first-order lag with time constant tau (seconds), starting at x[0]."""
+    a = 1.0 - math.exp(-1.0 / (tau * FS))
+    return signal.lfilter([a], [1.0, a - 1.0], x, zi=[(1.0 - a) * x[0]])[0]
 
 
 def interp_finite(t_new: np.ndarray, t: np.ndarray, x: np.ndarray) -> np.ndarray:
@@ -229,13 +234,26 @@ def lagged_r(bf: np.ndarray, nirs: np.ndarray, max_lag: int = MAX_LAG_S) -> tupl
 
 
 def cross_matrix(bf: np.ndarray, nirs: np.ndarray, max_lag: int = MAX_LAG_S) -> tuple[np.ndarray, np.ndarray]:
-    """R[i, j] = r(BF of session i, NIRS of session j); lag-adjusted and zero-lag."""
-    n = bf.shape[0]
-    r_lag = np.empty((n, n))
-    r_zero = np.empty((n, n))
-    for i in range(n):
-        for j in range(n):
-            r_lag[i, j], _, r_zero[i, j] = lagged_r(bf[i], nirs[j], max_lag)
+    """R[i, j] = r(BF of session i, NIRS of session j); lag-adjusted and zero-lag.
+
+    Same definition as ``lagged_r``, computed for all pairs at once.
+    """
+    m = bf.shape[1]
+
+    def z(a):
+        a = a - a.mean(axis=1, keepdims=True)
+        return a / np.linalg.norm(a, axis=1, keepdims=True)
+
+    r_lag = np.full((bf.shape[0], nirs.shape[0]), -np.inf)
+    r_zero = None
+    for lag in range(-max_lag, max_lag + 1):
+        if lag >= 0:
+            R = z(bf[:, lag:]) @ z(nirs[:, : m - lag]).T
+        else:
+            R = z(bf[:, : m + lag]) @ z(nirs[:, -lag:]).T
+        r_lag = np.maximum(r_lag, R)
+        if lag == 0:
+            r_zero = R
     return r_lag, r_zero
 
 
@@ -356,14 +374,9 @@ def maneuver_design(t: np.ndarray, events: np.ndarray, task_blocks: tuple[int, .
     task = np.interp(t, knots_t, knots_v)
     cols = [np.ones_like(t), (t - t.mean()) / (np.ptp(t) or 1.0), task]
     for tau in MANEUVER_TAUS_S:
-        a = 1.0 - math.exp(-1.0 / (tau * FS))
         y = task
         for _ in range(2):
-            z = np.empty_like(y)
-            z[0] = y[0]
-            for i in range(1, len(y)):
-                z[i] = z[i - 1] + a * (y[i] - z[i - 1])
-            y = z
+            y = lowpass1(y, tau)
             cols.append(y)
     return np.column_stack(cols)
 
@@ -449,8 +462,9 @@ def fmt_p(p: float) -> str:
 def report(results: dict[str, dict], layers: list[str]) -> str:
     lines = []
     for variant, title in (
-        ("full", "Full-session correlations (the paper's analysis)"),
-        ("residual", "After regressing out each session's own block-locked response"),
+        ("full", "Full-session correlations (the paper's analysis; describes the headline)"),
+        ("residual", "After regressing out each session's own block-locked response "
+                     "(p(gap) here is the calibrated test for session-specific tracking)"),
     ):
         if not any((variant, layers[0], "lag") in r["layers"] for r in results.values()):
             continue
@@ -486,8 +500,10 @@ def report(results: dict[str, dict], layers: list[str]) -> str:
     lines.append(
         "\nreal  = median r of same-session pairs; mixed = median per-session Fisher-mean r of"
         "\n        different-subject pairs in the same protocol; gap = median per-session real - mixed"
-        "\np(gap) = one-sided Wilcoxon signed-rank, gap > 0"
-        "\np(perm)= permutation test: true pairing vs random different-subject pairings"
+        "\np(gap) = one-sided Wilcoxon signed-rank, gap > 0. Use the residual p(gap) for inference:"
+        "\n         on full sessions, real pairs also share their own transition timing, which"
+        "\n         inflates false positives when transition durations vary (see README, Calibration)"
+        "\np(perm)= permutation test: true pairing vs random different-subject pairings (liberal)"
         "\nident = sessions whose BF matches its own NIRS best (expected by chance in brackets)"
     )
     return "\n".join(lines)

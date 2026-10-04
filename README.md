@@ -67,13 +67,13 @@ For each protocol and each NIRS layer (brain, scalp) it reports:
 | `real` | median r of same-session pairs (the paper's headline) |
 | `mixed` | median, over sessions, of the Fisher-averaged r of all different-subject pairs involving that session |
 | `gap` | median per-session `real − mixed` |
-| `p(gap)` | one-sided Wilcoxon signed-rank, gap > 0. **Primary test.** |
-| `p(perm)` | permutation test: true pairing vs 10,000 random different-subject pairings (secondary, see calibration) |
+| `p(gap)` | one-sided Wilcoxon signed-rank, gap > 0. **On the residual analysis, this is the test for session-specific tracking**; on full sessions it is descriptive (see Calibration) |
+| `p(perm)` | permutation test: true pairing vs 10,000 random different-subject pairings (too liberal, reported for completeness; see Calibration) |
 | `ident` | how many sessions' Temple-BF correlates best with *its own* NIRS trace, out of all sessions (chance ≈ 1) |
 | brain − scalp | the paper's brain-vs-scalp contrast, repeated for real pairs, mixed pairs, and the gap |
 
-**Secondary analysis (residual).** Before correlating, each signal has everything its
-own session's block timing can explain regressed out. The regressors are the task-block
+**Residual analysis.** Before correlating, each signal has everything its own session's
+block timing can explain regressed out. The regressors are the task-block
 indicator passed through 1st- and 2nd-order lags with time constants of 2–80 s, plus a
 trend. What is left is activity that is not locked to the maneuver. This is the closest
 this dataset gets to Limitation 6, sensitivity to "smaller spontaneous changes typical
@@ -86,90 +86,195 @@ which is the conservative choice. `--align onset` only aligns the first event.
 
 **Repeat participants.** Pairs from the same `subject_id` are never used as mixed pairs.
 
-## Results on simulated data
+## A simulation grounded in the paper
 
-The data below are simulated, not real. Block timings follow the paper. Response shapes,
-amplitudes and noise levels are my own assumptions, chosen so the headline r looks like
-the paper's. There are two imaginary devices:
+Before anyone runs the test on real recordings, a simulation can say what to expect. To
+be useful it has to be tied to the study, so every number in it comes from the paper,
+from published physiology, or from a fit to the paper's published results. Nothing is
+tuned by eye.
 
-- **tilt**: follows a generic response to the maneuver (in that session's own timing)
-  and never sees the session's own brain fluctuations
-- **person**: follows that session's actual brain trace
-- **person\***: the same "person" device in a world where every brain responds
-  identically
+### Where every number comes from
 
-20 sessions per protocol, lag-adjusted brain-layer r (`python simulate.py demo --perms 10000`):
+| parameter | value | source |
+|---|---|---|
+| block design | 5 blocks; 180 s (tilt, supine), 90 s (squat); task in blocks 2 and 4 | paper, Sec. 2.3, Fig. 2 |
+| brain response speed | first-order, τ = 14.4–28.9 s, drawn per session | paper, Sec. 3.1: half of the block peak in 10–20 s (τ = t½ / ln 2), peak at 60–90 s |
+| spontaneous fluctuations | band-limited noise, 0.01–0.12 Hz | literature: very-low-frequency (~0.04 Hz) and Mayer-wave (~0.1 Hz) cerebral oscillations, Obrig et al. 2000 |
+| analysis pipeline | 1 Hz, α = 0.35 EMA, ±30 s lag search, windows ±90 / ±45 s | paper, Sec. 2.5–2.6 |
+| Temple-BF delay | fitted (median optimal lag 13.5–15 s in every consistent fit) | fitted to the paper's 13–15 s median optimal lag, Sec. 3.2 |
+| size of session-specific brain variation | fitted | Table 1 and Table 2 brain-layer medians |
+| Temple-BF's own noise | fitted | same |
+| shared shape difference between Temple-BF and brain (a drift) | fitted | Fig. 4 group-mean r, which is below 1 |
+| scalp response size and speed | fitted | Table 1 scalp median, Fig. 4 scalp group-mean r |
+| transition gaps between blocks | 8–20 s | **assumed** (not reported); varied in the sensitivity runs |
+| trackable share of brain variation (physiology vs inversion noise) | 50% | **assumed**; varied 25–100% in the sensitivity runs |
+| **tracking share w** | 0, 0.5, 1 | **the unknown**: 0 = Temple-BF only follows the maneuver; 1 = it follows the session's own brain physiology |
 
-| device | protocol | real | mixed | gap | p(gap) | ident | residual real | residual mixed |
-|---|---|---|---|---|---|---|---|---|
-| tilt | hdt | 0.902 | 0.892 | 0.004 | 0.205 | 1/20 | 0.152 | 0.174 |
-| tilt | squat | 0.899 | 0.900 | −0.003 | 0.689 | 1/20 | 0.245 | 0.288 |
-| tilt | supine | 0.895 | 0.894 | −0.004 | 0.861 | 2/20 | 0.183 | 0.180 |
-| person | hdt | 0.969 | 0.899 | 0.070 | <0.001 | 20/20 | 0.697 | 0.149 |
-| person | squat | 0.974 | 0.905 | 0.070 | <0.001 | 20/20 | 0.681 | 0.291 |
-| person | supine | 0.967 | 0.891 | 0.071 | <0.001 | 20/20 | 0.714 | 0.171 |
-| person\* | hdt | 0.969 | 0.969 | 0.001 | 0.123 | 4/20 | 0.138 | 0.134 |
-| person\* | squat | 0.973 | 0.973 | 0.000 | 0.392 | 3/20 | 0.200 | 0.213 |
-| person\* | supine | 0.969 | 0.969 | 0.000 | 0.608 | 2/20 | 0.125 | 0.133 |
+### How the fit works (`fit_to_paper.py`)
 
-What this shows:
+1. For each protocol and each w, simulated sessions go through the paper's analysis.
+   The free parameters are fitted so that six published statistics come out right:
+   - median lag-adjusted r, brain and scalp layers (Table 1)
+   - median zero-lag r, brain layer (Table 1)
+   - median transition-window r (Table 2)
+   - group-mean r, brain and scalp layers (Fig. 4)
 
-1. **Both devices get an impressive headline.** In this setup the maneuver alone gives
-   r ≈ 0.89–0.90. Only the gap and the identification count tell the devices apart.
-2. **The gap grows with how much the device tracks the session.** Blending the two
-   devices, head-down tilt:
+   The fit also has to land the median lag at 13–15 s. The search uses differential
+   evolution, a global, gradient-free method; a local search got stuck because the
+   statistics are medians and lag maxima. The random draws are fixed across evaluations
+   (common random numbers).
+2. **Consistency with the paper is judged against the paper's own sampling error.** The
+   standard error of each statistic is estimated from 30 simulated 20-session studies.
+   A parameter set counts as consistent when its χ² distance to the paper (in
+   standard-error units, 5 df) is at most 11.07, the 95% point.
+3. Several parameter sets fit equally well, and they predict different gaps. So for each
+   w the script searches the consistent sets for the **smallest and largest gap**: an
+   identification set, meaning every gap between the two ends fits what the paper
+   reports. At both ends it runs the full mixed-pair test on 40 simulated studies to get
+   power.
 
-   | share of "person" signal | 0 | 0.25 | 0.5 | 0.75 | 1 |
-   |---|---|---|---|---|---|
-   | real | 0.902 | 0.929 | 0.950 | 0.965 | 0.969 |
-   | mixed | 0.892 | 0.905 | 0.911 | 0.909 | 0.899 |
-   | gap | 0.004 | 0.020 | 0.035 | 0.055 | 0.070 |
-   | p(gap) | 0.205 | <0.001 | <0.001 | <0.001 | <0.001 |
-   | ident | 1/20 | 5/20 | 17/20 | 19/20 | 20/20 |
+### Two things the paper's numbers imply about its methods
 
-3. **The brain-vs-scalp contrast can come entirely from the shared maneuver.** For the
-   "tilt" device, the brain-minus-scalp difference on real pairs is large and
-   significant (hdt 0.92, squat 0.14, supine 0.08, all p < 0.001). But it is just as
-   large on mixed pairs (1.03, 0.15, 0.09), and the difference in *gaps* is about zero.
-   The brain layer's average response shape simply resembles the device's average
-   response shape more than the scalp layer's does. That is still informative, but it
-   is a statement about response shapes, not about tracking a person. The "person"
-   device keeps a brain-over-scalp advantage in the gap for squat and supine
-   (0.066 and 0.079, p < 0.001). So the tool reports the contrast at all three levels.
-4. **A small gap is not a failure** (row `person*`). If everyone's brain responds the
-   same way, even a perfect device shows no gap.
+- **The transition-window correlations were almost certainly lag-aligned.** For squat
+  the paper reports transition r = 0.861, which is above its zero-lag full-session
+  r = 0.701. With the 13–15 s lag, a zero-lag ±45 s window cannot exceed about 0.88 even
+  with no noise at all. That leaves no room for the noise that pulls the full-session
+  zero-lag r down to 0.701. The paper does align on the session's optimal lag for its
+  partial correlations, so the simulation does the same for the transition windows.
+- **The average Temple-BF and brain shapes differ.** Group-mean r is 0.915–0.941, not 1,
+  and per-session r is about as high. If Temple-BF had exactly the brain's average shape,
+  group-mean r would be close to 1, so the simulation includes a shared shape difference.
+
+## What the paper's published numbers can and cannot tell us
+
+Best fit per protocol and tracking share w (simulated statistics; paper in the first
+row of each block). χ² ≤ 11.07 means consistent with the paper.
+
+| protocol | w | lag-adj. r brain | lag-adj. r scalp | zero-lag r brain | transition r | group r brain | group r scalp | median lag (s) | χ² |
+|---|---|---|---|---|---|---|---|---|---|
+| squat | *paper* | *0.843* | *0.700* | *0.701* | *0.861* | *0.916* | *0.783* | *13–15* | |
+| squat | 0 | 0.835 | 0.700 | 0.719 | 0.847 | 0.916 | 0.783 | 17.5 | **20.9** |
+| squat | 0.5 | 0.837 | 0.699 | 0.704 | 0.862 | 0.917 | 0.783 | 14.0 | 1.7 |
+| squat | 1 | 0.843 | 0.676 | 0.692 | 0.856 | 0.916 | 0.792 | 14.4 | 1.7 |
+| supine | *paper* | *0.839* | *0.767* | *0.796* | *0.876* | *0.941* | *0.929* | *13–15* | |
+| supine | 0 | 0.842 | 0.767 | 0.805 | 0.878 | 0.940 | 0.929 | 14.6 | 5.3 |
+| supine | 0.5 | 0.840 | 0.767 | 0.800 | 0.867 | 0.941 | 0.929 | 14.0 | 4.1 |
+| supine | 1 | 0.845 | 0.767 | 0.798 | 0.858 | 0.940 | 0.930 | 14.9 | 11.9 |
+| head-down tilt | *paper* | *0.912* | *0.494* | *0.826* | *0.878* | *0.915* | *0.430* | *13–15* | |
+| head-down tilt | 0 / 0.5 / 1 | 0.88–0.90 | 0.45–0.47 | 0.83–0.84 | 0.92–0.95 | 0.92 | 0.54–0.56 | 15–20 | **407–579** |
+
+What this says:
+
+1. **For stand-to-supine, the published statistics fit a device that only follows the
+   maneuver as well as one that tracks the person.** No analysis in the paper can tell
+   these apart. That is the gap Limitation 2 describes, and it is what the mixed-pair
+   test measures.
+2. **For stand-to-squat, a maneuver-only device fits everything except the lag.** To
+   reproduce the drop from lag-adjusted r (0.843) to zero-lag r (0.701) it needs a 17–20 s
+   delay, while the paper reports 13–15 s. A tracking device produces that drop at a 14 s
+   lag, because the faster fluctuations it shares with the brain decorrelate when
+   misaligned. This hints that Temple-BF carries session-specific information during
+   squats, but the hint depends on the model. The robustness runs below test it, and only
+   the mixed-pair test on real data can settle it.
+3. **Head-down tilt is not reproduced by any version of the model** (χ² ≥ 344 in every
+   run). The paper's per-session r (0.912) is almost equal to its group-mean r (0.915),
+   while its transition r is lower (0.878). The simple response shapes used here cannot
+   produce that combination; the tilt-table response probably has a different shape.
+   So nothing below is predicted for head-down tilt.
+4. **The paper's brain-versus-scalp contrast does not need any tracking.** With w = 0, the
+   brain-layer r beats the scalp-layer r (one-sided Wilcoxon, p < 0.05) in 100% of
+   simulated studies for every protocol. A device that only follows the maneuver
+   reproduces the paper's main contrast, because the brain layer's *average* response
+   resembles the device's average response more than the scalp layer's does. Repeating
+   the contrast on the gap (`brain − scalp` in the output) removes this.
+
+## What the test would show on real recordings
+
+Range of outcomes consistent with the paper, brain layer, lag-adjusted, 20 sessions.
+Power is the share of 40 simulated studies with p(gap) < 0.05. The residual test is the
+calibrated one (see Calibration).
+
+| protocol | w | full-session gap | own trace matched best (of 20) | residual gap | residual-test power |
+|---|---|---|---|---|---|
+| squat | 0 | 0.001 | 1 | −0.003 | 0.05 (false positives) |
+| squat | 0.5 | 0.046 – 0.076 | 11 – 18 | 0.17 – 0.43 | 1.00 |
+| squat | 1 | 0.038 – 0.094 | 12 – 20 | 0.12 – 0.36 | 0.97 – 1.00 |
+| supine | 0 | 0.001 | 1 | −0.008 | 0.03 (false positives) |
+| supine | 0.5 | 0.001 – 0.008 | 2 – 5 | −0.008 – 0.009 | 0.00 – 0.15 |
+| supine | 1 | 0.015 – 0.019 | 11 – 12 | 0.05 – 0.08 | 1.00 |
+
+Gaps look small in units of r because the headline r is already high: the maneuver
+alone gives r ≈ 0.76–0.84 here. The identification count is easier to read. A device
+that tracks the session should pick out its own session's brain trace in 11–20 of 20
+squat sessions, against 1 expected by chance.
+
+### Sensitivity to the assumptions (w = 1)
+
+Each row changes one assumed value and redoes the whole fit.
+
+| assumption changed | squat gap | squat residual power | supine gap | supine residual power | χ² squat / supine |
+|---|---|---|---|---|---|
+| none (main run) | 0.038 – 0.094 | 0.97 – 1.00 | 0.015 – 0.019 | 1.00 | 1.7 / 11.9 |
+| trackable share 25% | 0.011 – 0.045 | 0.20 – 1.00 | 0.001 – 0.013 | 0.00 – 0.75 | 0.0 / 5.7 |
+| trackable share 100% | 0.012 – 0.063 | 0.90 – 1.00 | 0.001 – 0.017 | 0.00 – 1.00 | 0.0 / 8.1 |
+| fluctuations down to 0.003 Hz | 0.009 – 0.073 | 0.28 – 1.00 | 0.010 – 0.035 | 0.70 – 1.00 | 0.0 / 3.7 |
+| transition gaps 5–30 s | 0.018 – 0.062 | 0.90 – 1.00 | 0.003 – 0.013 | 0.07 – 0.88 | 1.2 / 2.2 |
+
+The squat result for a maneuver-only device (w = 0) also holds when the assumptions
+change. It stays inconsistent with the paper because it needs a 17–18 s lag: χ² = 20.5
+with fluctuations down to 0.003 Hz, and 15.1 with transition gaps of 5–30 s. For supine,
+w = 0 stays consistent (χ² 3.7–5.1).
+
+What to expect on the real data, then:
+- If Temple-BF tracks the session during squats, the test is likely to show it. The
+  residual test detects it in most simulated studies under most assumptions; the
+  low-end exceptions are when little of the brain variation is trackable.
+- For stand-to-supine the expected gap is smaller, and detection depends on the
+  assumptions.
+- **Squat is the protocol to run first.**
 
 ### Calibration
 
-How often does the test report a gap when the device only follows the tilt? Here are
-100 simulated null studies (`python calibrate.py --studies 100`), showing the share with
-p < 0.05:
+How often does the test report a gap when the device only follows the maneuver? This
+uses the w = 0 fit, over 100 simulated null studies (`python calibrate.py --studies 100`),
+and shows the share with p < 0.05:
 
-| protocol | analysis | p(gap) | p(perm) | p(id) |
-|---|---|---|---|---|
-| hdt | full, lag-adjusted | 0.02 | 0.09 | 0.02 |
-| squat | full, lag-adjusted | 0.03 | 0.09 | 0.05 |
-| supine | full, lag-adjusted | 0.01 | 0.05 | 0.03 |
-| hdt | residual, lag-adjusted | 0.02 | 0.02 | 0.02 |
-| squat | residual, lag-adjusted | 0.03 | 0.05 | 0.04 |
-| supine | residual, lag-adjusted | 0.06 | 0.07 | 0.05 |
+| protocol | analysis | transition gaps 8–20 s: p(gap) | p(perm) | gaps 5–30 s: p(gap) | p(perm) |
+|---|---|---|---|---|---|
+| squat | full, lag-adjusted | 0.00 | 0.15 | **0.29** | **0.72** |
+| squat | residual, lag-adjusted | 0.09 | 0.15 | 0.07 | 0.11 |
+| supine | full, lag-adjusted | 0.03 | 0.07 | **0.19** | **0.35** |
+| supine | residual, lag-adjusted | 0.06 | 0.10 | 0.05 | 0.10 |
+| head-down tilt | full, lag-adjusted | 0.08 | 0.23 | **0.61** | **0.84** |
+| head-down tilt | residual, lag-adjusted | 0.04 | 0.05 | 0.01 | 0.03 |
 
-The primary test, `p(gap)`, stays at or below the nominal 5% (slightly above for
-supine residual, 6%). On full sessions, the permutation test runs somewhat liberal
-(up to 9–12% across variants). The cause is that real pairs share their session's exact
-transition timing, which mixed pairs cannot fully reproduce even after warping. This is
-why `p(gap)` is the primary test. The residual analysis removes timing-locked
-components and is calibrated.
+(`python calibrate.py --studies 100 --gap 5,30` for the right-hand columns; full output,
+including zero-lag rows, in `results/calibration_*.txt`.)
+
+**This changed the method.** On full sessions, a real pair shares its own exact
+transition timing, and mixed pairs cannot fully reproduce that even after time-warping.
+When transition durations vary a lot, that timing alone produces a small but
+"significant" gap (0.002–0.003) for a device that only follows the maneuver. The
+residual analysis regresses each session's own timing out, and it stays near the
+nominal 5% (1–9%). So:
+
+- **The residual p(gap) is the test for session-specific tracking.**
+- The full-session real / mixed / gap numbers describe how much of the headline the
+  maneuver explains, but they are not used for inference.
+- The permutation p value is too liberal and is reported only for completeness.
+- On real data, the events files give the actual transition durations. Rerunning
+  `calibrate.py --gap` with their observed range shows how much the full-session test
+  can be trusted.
 
 ## How to read a result on the real recordings
 
-- **A clear gap on the brain layer** means Temple-BF carries information about the
-  individual session beyond the imposed maneuver. That strengthens the paper's claim.
+- **A clear residual gap on the brain layer** means Temple-BF carries information about
+  the individual session beyond the imposed maneuver and its timing. That strengthens the paper's claim.
   A larger gap for brain than for scalp would be a stronger version of the paper's
   brain-vs-scalp argument.
 - **A small gap does not mean the device fails.** It can mean that people's brain
   responses to a tilt are very similar, so there is little session-specific signal to
-  track (see `person*`).
+  track (`python simulate.py demo`, row `person*`).
 - **Mixed / real** is a rough estimate of how much of the headline the maneuver alone
   explains.
 
@@ -185,17 +290,27 @@ components and is calibrated.
   The residual analysis removes responses locked to the session's own block timing, but
   not things like squat depth.
 - **Power.** With 20 sessions per protocol, small gaps may not reach significance.
-- **Simulation.** Every number above comes from my assumptions about signal shapes and
-  noise. They illustrate the method and are not predictions about the real data.
+- **The simulation matches the paper's medians, not its spread.** The violin plots in
+  Fig. 4 show more session-to-session variation than the simulation has. For example,
+  the paper's stand-to-supine brain-minus-scalp difference was not significant
+  (p = 0.082), but it is significant in every simulated study. So the power figures
+  above are best cases.
+- **Head-down tilt is not modelled well** (see above), so there is no prediction for it.
+- **The simulation is a model.** The response shapes are first-order, the device is a
+  linear mix, and the fluctuations are band-limited noise. The fits show this model is
+  consistent with the paper's published numbers for squat and supine, not that it is
+  correct.
 
 ## Usage
 
 ```bash
 pip install -r requirements.txt
 
-python simulate.py demo                       # the tables above
-python calibrate.py --studies 100             # false-positive check (~2 min on 4 cores)
 python -m pytest                              # tests
+python fit_to_paper.py                        # fit to the paper, gap ranges, power (~25 min on 4 cores)
+python fit_to_paper.py --mixes 1 --phys-share 0.25 --out results/sens_q025.json   # a sensitivity run
+python calibrate.py --studies 100 [--gap 5,30]   # false-positive check (~3 min)
+python simulate.py demo                       # one simulated study per device, fitted parameters
 
 # on recordings
 python shared_maneuver_test.py manifest.csv --out results/
@@ -242,7 +357,10 @@ dataset in this format.
 | file | purpose |
 |---|---|
 | `shared_maneuver_test.py` | the analysis (numpy + scipy only) |
-| `simulate.py` | synthetic sessions and the demo tables |
+| `simulate.py` | synthetic sessions; every parameter labelled with its source |
+| `fit_to_paper.py` | fits the simulation to the paper's published statistics; gap ranges and power |
+| `paper_fit.json` | the main fit (used by `simulate.py demo` and `calibrate.py`) |
+| `results/` | sensitivity runs and calibration output behind the tables above |
 | `calibrate.py` | false-positive check on simulated null studies |
 | `tests/` | unit and end-to-end tests |
 
@@ -251,9 +369,13 @@ dataset in this format.
 - Gulati D, Rudaeva A, Dutta A, Rogers D, Prajapat R, Kumar N, Gupta S, Goyal D,
   Boas DA. *Evaluating Brain Flow Index from a temple-worn wearable against
   depth-resolved time-domain NIRS during head-down tilt and postural transitions in
-  healthy young men.* bioRxiv 2026. doi:10.64898/2026.09.17.751664. Methods Sec. 2.5–2.6,
-  Table 1, Fig. 4, Limitations 2 and 6. The paper says the recordings are available
+  healthy young men.* bioRxiv 2026. doi:10.64898/2026.09.17.751664. Sec. 2.3–2.6, 3.1–3.2,
+  Tables 1–2, Figs. 2–4, Limitations 2 and 6. The paper says the recordings are available
   from the corresponding author on reasonable request (research@temple.com).
+- Obrig H, Neufang M, Wenzel R, Kohl M, Steinbrink J, Einhäupl K, Villringer A.
+  *Spontaneous low frequency oscillations of cerebral hemodynamics and metabolism in
+  human adults.* NeuroImage 2000;12(6):623–639. doi:10.1006/nimg.2000.0657
+  (frequency bands of spontaneous fluctuations).
 - Nguyen T, Hoehl S, Vrtička P. *A Guide to Parent-Child fNIRS Hyperscanning Data
   Processing and Analysis.* Sensors 2021;21(12):4075 (random-pair analysis).
 - Nastase SA, Gazzola V, Hasson U, Keysers C. *Measuring shared responses across
